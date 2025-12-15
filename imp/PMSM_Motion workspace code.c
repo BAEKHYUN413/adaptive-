@@ -43,8 +43,8 @@ _iq SpeedRef_CMD = _IQ(0.0);        // Speed Ref Input (pu)
 _iq ramper(_iq, _iq, _iq);          // slew programmable ramper
 
 _iq Ipeak = _IQ(0.0);   //Three phase motor current peak
-_iq a[550];
-_iq b[550];
+_iq a[700];
+_iq b[700];
 
 int n=0;
 int s=0;
@@ -687,14 +687,14 @@ void PMSM_Motion_LEVEL4()
 void PMSM_Motion_LEVEL5()
 {
 #if (BUILDLEVEL==LEVEL5)
-    if((IdRef != 0) && (IqRef != 0) && (sc <= 2000)){
+    if((IdRef != 0) && (IqRef != 0) && (sc <= 30000)){
         sc=sc+1;
     }
-    if((IdRef != 0) && (IqRef != 0) && (sc1 <= 2000)){
+    if((IdRef != 0) && (IqRef != 0) && (sc1 <= 30000)){
         sc1=sc1+1;
     }
     if(lsw == 0){
-        for(n=0;n<550;n++){
+        for(n=0;n<700;n++){
             a[n]=_IQ(0.0);
             b[n]=_IQ(0.0);
         }
@@ -811,13 +811,13 @@ void PMSM_Motion_LEVEL5()
     }
     PID_GR_MACRO(pid1_id);
 // && (sc%4 == 0)
-    if((IdRef != 0) && (IqRef != 0) && (sc%4 == 0)){
-        if(n != 2000){
+    if((IdRef != 0) && (IqRef != 0) && (sc%43 == 0)){
+        if(n != 700){
             a[n]=pid1_id.data.IqFbk;
             b[n]=pid1_id.data.IdFbk;
             n++;
-            if(sc == 2000)
-                n=2000;
+            if(sc == 30000)
+                n=700;
         }
     }
 /*    if((IdRef != 0) && (IqRef != 0)){
