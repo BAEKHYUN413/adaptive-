@@ -1,0 +1,366 @@
+/* -----------------------------------------------------------------------------------
+File name:      PID_grando.h
+
+Originator:     C2000 System Applications, Texas Instruments
+
+Description:    Data and macro definitions for "grando" PID controller
+-------------------------------------------------------------------------------------*/
+
+#ifndef __PID_GRANDO_H__
+#define __PID_GRANDO_H__
+
+typedef struct {  _iq  Ref;             // Input: reference set-point
+                  _iq  Fbk;             // Input: feedback
+                  _iq  Out;             // Output: controller output
+                  _iq  c1;              // Internal: derivative filter coefficient 1
+                  _iq  c2;              // Internal: derivative filter coefficient 2
+                  _iq  RefId;
+                  _iq  RefIq;
+                  _iq  FbkId;
+                  _iq  FbkIq;
+                  _iq  VdOut;
+                  _iq  VqOut;
+                  _iq  Vdout;
+                  _iq  Vqout;
+                  _iq  We;
+                  _iq  t;
+                  _iq  Tq;
+                  _iq  run;
+                  _iq  Ichange;
+                } PID_GRANDO_TERMINALS; //term
+                // note: c1 & c2 placed here to keep structure size under 8 words
+
+typedef struct {  _iq  Kr;              // Parameter: reference set-point weighting
+                  _iq  Kp;              // Parameter: proportional loop gain
+                  _iq  Ki;              // Parameter: integral gain
+                  _iq  Kd;              // Parameter: derivative gain
+                  _iq  Km;              // Parameter: derivative weighting
+                  _iq  Umax;            // Parameter: upper saturation limit
+                  _iq  Umin;            // Parameter: lower saturation limit
+                  _iq  Q;               //I
+                  _iq  G;               //V
+                  _iq  B1;
+                  _iq  B2;
+                  _iq  Rs;
+                  _iq  Ld;
+                  _iq  Lq;
+                  _iq  Psi;
+                  _iq  cd;
+                  _iq  cq;
+                  _iq  Etad;
+                  _iq  Etaq;
+                  _iq  Alpha;           //SMC Alpha
+                  _iq  Beta;            //SMC Beta
+                  _iq  alphad;           //PI alpha
+                  _iq  alphaq;
+                  _iq  betad;            //PI beta
+                  _iq  betaq;
+                  _iq  KQ;
+                  _iq  KD;
+                  _iq  KPqint;
+                  _iq  KPdint;
+                } PID_GRANDO_PARAMETERS;
+
+typedef struct {  _iq  up;              // Data: proportional term
+                  _iq  ui;              // Data: integral term
+                  _iq  ud;              // Data: derivative term
+                  _iq  v1;              // Data: pre-saturated controller output
+                  _iq  i1;              // Data: integrator storage: ui(k-1)
+                  _iq  d1;              // Data: differentiator storage: ud(k-1)
+                  _iq  d2;              // Data: differentiator storage: d2(k-1)
+                  _iq  w1;              // Data: saturation record: [u(k-1) - v(k-1)]
+                  _iq  Id;              //Ref
+                  _iq  Iq;              //Ref
+                  _iq  IdFbk;           //t
+                  _iq  IqFbk;           //t
+                  _iq  Idfbk;           //t-1
+                  _iq  Iqfbk;           //t-1
+                  _iq  ED;
+                  _iq  EQ;
+                  _iq  Ed;
+                  _iq  Eq;
+                  _iq  Sgnd;
+                  _iq  Sgnq;
+                  _iq  SigmaD;
+                  _iq  SigmaQ;
+                  _iq  Sigmad;
+                  _iq  Sigmaq;
+                  _iq  varD;            //t
+                  _iq  varQ;            //t
+                  _iq  varD1;           //t-1
+                  _iq  varQ1;           //t-1
+                  _iq  Vd;
+                  _iq  Vd1;
+                  _iq  Vd2;
+                  _iq  Vd3;
+                  _iq  Vd4;
+                  _iq  Vq;
+                  _iq  Vq1;
+                  _iq  Vq2;
+                  _iq  Vq3;
+                  _iq  Vq4;
+                  _iq  Vq5;             //SMC end
+                  _iq  vd;
+                  _iq  vq;
+                  _iq  KPd;
+                  _iq  KPq;
+                  _iq  KPdreg;
+                  _iq  KPqreg;
+                  _iq  deltad;           //parametric variations
+                  _iq  deltaq;
+                  _iq  deltadreg;
+                  _iq  deltaqreg;
+                  _iq  Iqreg;
+                  _iq  Idreg;
+                  _iq  KPqlocked;
+                  _iq  KPdlocked;
+                  _iq  ed_inzonecnt;
+                  _iq  eq_inzonecnt;
+                } PID_GRANDO_DATA;
+
+
+typedef struct {  PID_GRANDO_TERMINALS  term;
+                  PID_GRANDO_PARAMETERS param;
+                  PID_GRANDO_DATA       data;
+                } PID_GRANDO_CONTROLLER;
+
+
+typedef PID_GRANDO_CONTROLLER   *PID_handle;
+
+
+/*-----------------------------------------------------------------------------
+Default initalisation values for the PID_GRANDO objects
+-----------------------------------------------------------------------------*/
+
+#define PID_TERM_DEFAULTS {             \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           1,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0,           \
+                           0            \
+                          }
+
+#define PID_PARAM_DEFAULTS {            \
+                           _IQ(1.0),    \
+                           _IQ(1.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(1.0),    \
+                           _IQ(1.0),    \
+                           _IQ(-1.0),   \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0)     \
+                          }
+
+#define PID_DATA_DEFAULTS {             \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(1.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                           _IQ(0.0),    \
+                          }
+
+/*------------------------------------------------------------------------------
+    PID_GRANDO Macro Definition
+------------------------------------------------------------------------------*/
+
+#define PID_GR_MACRO(v)                                                                             \
+                                                                                                    \
+    /* Q transform */                                                                               \
+    v.data.Id = _IQmpy(v.param.Q, v.term.RefId);                                                    \
+    v.data.Iq = _IQmpy(v.param.Q, v.term.RefIq);                                                    \
+    v.data.Idfbk = v.data.IdFbk;                                                                    \
+    v.data.Iqfbk = v.data.IqFbk;                                                                    \
+    v.data.IdFbk = _IQmpy(v.param.Q, v.term.FbkId);                                                 \
+    v.data.IqFbk = _IQmpy(v.param.Q, v.term.FbkIq);                                                 \
+                                                                                                    \
+    /* Ed Eq */                                                                                     \
+    v.data.Ed = v.data.ED;                                                                          \
+    v.data.Eq = v.data.EQ;                                                                          \
+    v.data.ED = v.data.Id - v.data.IdFbk;                                                           \
+    v.data.EQ = v.data.Iq - v.data.IqFbk;                                                           \
+                                                                                                    \
+    /* Sigma */                                                                                     \
+    v.data.Sigmad = v.data.SigmaD;                                                                  \
+    v.data.Sigmaq = v.data.SigmaQ;                                                                  \
+    v.data.SigmaD = v.data.Sigmad + (v.data.ED - v.data.Ed) + _IQmpy(_IQmpy(v.param.cd, v.data.Ed), v.term.t);    \
+    v.data.SigmaQ = v.data.Sigmaq + (v.data.EQ - v.data.Eq) + _IQmpy(_IQmpy(v.param.cq, v.data.Eq), v.term.t);    \
+                                                                                                    \
+    /* Sgn function */                                                                              \
+    if(_IQdiv(v.data.SigmaD, v.param.B1) > 1) v.data.Sgnd = _IQ(1.0);                               \
+    else if(_IQdiv(v.data.SigmaD, v.param.B1) < -1) v.data.Sgnd = _IQ(-1.0);                        \
+    else v.data.Sgnd = _IQdiv(v.data.SigmaD, v.param.B1);                                           \
+    if(_IQdiv(v.data.SigmaQ, v.param.B2) > 1) v.data.Sgnq = _IQ(1.0);                               \
+    else if(_IQdiv(v.data.SigmaQ, v.param.B2) < -1) v.data.Sgnq = _IQ(-1.0);                        \
+    else v.data.Sgnq = _IQdiv(v.data.SigmaQ, v.param.B2);                                           \
+                                                                                                    \
+    /* SMC VdVq */                                                                                  \
+    v.data.Vd1 = _IQmpy(v.param.Rs, v.data.IdFbk);                                                 \
+    v.data.Vd2 = _IQmpy(_IQmpy(v.param.Lq, v.term.We), v.data.IqFbk);                              \
+    if((v.term.run==2) && (IdRef != 0) && (IqRef != 0)){v.data.varD1 = v.data.varD;                 \
+    v.data.varD = v.data.varD1 + _IQmpy(_IQmpy(v.data.SigmaD, v.term.t), v.param.Alpha);}           \
+    v.data.Vd3 = _IQmpy(_IQmpy(v.param.cd, v.data.ED), v.param.Ld);                                \
+    v.data.Vd4 = _IQmpy(_IQmpy(v.param.Etad, v.data.Sgnd), v.param.Ld);                            \
+    v.data.Vq1 = _IQmpy(v.param.Rs, v.data.IqFbk);                                                 \
+    v.data.Vq2 = _IQmpy(_IQmpy(v.param.Ld, v.term.We), v.data.IdFbk);                              \
+    v.data.Vq3 = _IQmpy(v.param.Psi, v.term.We);                                                    \
+    if((v.term.run==2) && (IdRef != 0) && (IqRef != 0)){v.data.varQ1 = v.data.varQ;                 \
+    v.data.varQ = v.data.varQ1 + _IQmpy(_IQmpy(v.data.SigmaQ, v.term.t), v.param.Beta);}            \
+    v.data.Vq4 = _IQmpy(_IQmpy(v.param.cq, v.data.EQ), v.param.Lq);                                \
+    v.data.Vq5 = _IQmpy(_IQmpy(v.param.Etaq, v.data.Sgnq), v.param.Lq);                            \
+    /*v.data.Vd = v.data.Vd1 - v.data.Vd2 + _IQmpy(v.data.varD, v.param.Ld) + v.data.Vd3 + v.data.Vd4;*/   \
+    v.data.Vd = v.data.Vd1 - v.data.Vd2 + _IQmpy(v.data.varD, v.param.Ld) + v.data.Vd3 + v.data.Vd4; \
+    /*v.data.Vq = v.data.Vq1 + v.data.Vq2 + v.data.Vq3 + _IQmpy(v.data.varQ, v.param.Lq) + v.data.Vq4 + v.data.Vq5;*/    \
+    v.data.Vq = v.data.Vq1 + v.data.Vq2 + v.data.Vq3 + _IQmpy(v.data.varQ, v.param.Lq) + v.data.Vq4 + v.data.Vq5;  \
+                                                                                                    \
+    /* Torque */                                                                                    \
+    v.term.Tq = _IQmpy((_IQmpy(v.param.Psi, v.data.IqFbk) + _IQmpy(_IQmpy((v.param.Ld - v.param.Lq), v.data.IdFbk), v.data.IqFbk)), _IQ(7.5)); \
+                                                                                                    \
+    /* SMC control output */                                                                        \
+    v.term.VdOut = _IQsat(_IQdiv(v.data.Vd, v.param.G), v.param.Umax, v.param.Umin);                \
+    v.term.VqOut = _IQsat(_IQdiv(v.data.Vq, v.param.G), v.param.Umax, v.param.Umin);                \
+                                                                                                    \
+    /* kp int */                                                                                    \
+    if(v.term.Ichange == _IQ(1.0))                                                                  \
+    {                                                                                               \
+        v.data.KPd = v.param.KPdint;                                                                \
+        v.data.KPq = v.param.KPqint;                                                                \
+        v.data.KPdlocked = 0;                                                                       \
+        v.data.KPqlocked = 0;                                                                       \
+    }                                                                                               \
+                                                                                                    \
+    /* kp */                                                                                        \
+    v.data.KPdreg = v.data.KPd;                                                                     \
+    v.data.KPqreg = v.data.KPq;                                                                     \
+    if(!v.data.KPdlocked){                                                                          \
+    if((v.data.ED <= _IQ(0.005)) && (v.data.ED >= _IQ(-0.005))){                                      \
+        v.data.ed_inzonecnt++;                                                                      \
+        if(v.data.ed_inzonecnt >= 20){v.data.KPdlocked = 1;                                         \
+    }}                                                                                               \
+    else{v.data.ed_inzonecnt = 0;                                                                   \
+    v.data.KPd = v.data.KPdreg + _IQmpy(_IQdiv(_IQdiv(_IQmpy(v.data.ED, v.data.ED), v.param.Ld), v.param.betad), v.term.t);}} \
+    if(!v.data.KPqlocked){                                                                          \
+    if((v.data.EQ <= _IQ(0.001)) && (v.data.EQ >= _IQ(-0.001))){                                      \
+        v.data.eq_inzonecnt ++;                                                                     \
+        if(v.data.eq_inzonecnt >= 20){v.data.KPqlocked = 1;                                         \
+    }}                                                                                              \
+    else{v.data.eq_inzonecnt = 0;                                                                   \
+    v.data.KPq = v.data.KPqreg + _IQmpy(_IQdiv(_IQdiv(_IQmpy(v.data.EQ, v.data.EQ), v.param.Lq), v.param.betaq), v.term.t);}} \
+                                                                                                    \
+    /* delta */                                                                                     \
+    v.data.deltadreg = v.data.deltad;                                                               \
+    v.data.deltaqreg = v.data.deltaq;                                                               \
+    v.data.deltad = v.data.deltadreg + _IQmpy(_IQdiv(_IQdiv(v.data.ED, v.param.Ld), v.param.alphad), v.term.t);  \
+    v.data.deltaq = v.data.deltaqreg + _IQmpy(_IQdiv(_IQdiv(v.data.EQ, v.param.Lq), v.param.alphaq), v.term.t);  \
+                                                                                                    \
+    /* PI adaptive VdVq */                                                                                   \
+    v.data.vd = _IQmpy(v.data.ED, v.data.KPd) + v.data.deltad + _IQmpy(v.param.Rs, v.data.IdFbk) - _IQmpy(_IQmpy(v.term.We, v.param.Lq), v.data.IqFbk);    \
+    v.data.vq = _IQmpy(v.data.EQ, v.data.KPq) + v.data.deltaq + _IQmpy(_IQmpy(v.term.We, v.param.Ld), v.data.IdFbk) + _IQmpy(v.param.Rs, v.data.IqFbk) + _IQmpy(v.term.We, v.param.Psi);   \
+    /*v.data.vd = v.data.ED + v.data.deltad + _IQmpy(v.param.Rs, v.data.IdFbk) - _IQmpy(_IQmpy(v.term.We, v.param.Lq), v.data.IqFbk);  */  \
+    /*v.data.vq = v.data.EQ + v.data.deltaq + _IQmpy(_IQmpy(v.term.We, v.param.Ld), v.data.IdFbk) + _IQmpy(v.param.Rs, v.data.IqFbk) + _IQmpy(v.term.We, v.param.Psi);  */ \
+                                                                                                    \
+    /* PI VOut */                                                                                   \
+    v.term.Vdout = _IQsat(_IQdiv(v.data.vd, v.param.G), v.param.Umax, v.param.Umin);                \
+    v.term.Vqout = _IQsat(_IQdiv(v.data.vq, v.param.G), v.param.Umax, v.param.Umin);                \
+                                                                                                    \
+    /* proportional term */                                                                         \
+    v.data.up = _IQmpy(v.param.Kr, v.term.Ref) - v.term.Fbk;                                        \
+                                                                                                    \
+    /* integral term */                                                                             \
+    v.data.ui = _IQmpy(v.param.Ki, _IQmpy(v.data.w1, (v.term.Ref - v.term.Fbk))) + v.data.i1;       \
+    v.data.i1 = v.data.ui;                                                                          \
+                                                                                                    \
+    /* derivative term */                                                                           \
+    v.data.d2 = _IQmpy(v.param.Kd, _IQmpy(v.term.c1, (_IQmpy(v.term.Ref, v.param.Km) - v.term.Fbk))) - v.data.d2;   \
+    v.data.ud = v.data.d2 + v.data.d1;                                                              \
+    v.data.d1 = _IQmpy(v.data.ud, v.term.c2);                                                       \
+                                                                                                    \
+    /* control output */                                                                            \
+    v.data.v1 = _IQmpy(v.param.Kp, (v.data.up + v.data.ui + v.data.ud));                            \
+    v.term.Out = _IQsat(v.data.v1, v.param.Umax, v.param.Umin);                                     \
+    v.data.w1 = (v.term.Out == v.data.v1) ? _IQ(1.0) : _IQ(0.0);                                    \
+
+#endif // __PID_GRANDO_H__
